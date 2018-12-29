@@ -255,6 +255,7 @@ elif [[ "$CMD" == "deploy-web" ]]; then
 # Initialization commands
 # =============================================
 
+# Install new local environment
 elif [[ "$CMD" == "install" ]]; then
   RUN='cd $ROOT_PATH;
        git submodule init;
@@ -262,6 +263,10 @@ elif [[ "$CMD" == "install" ]]; then
        git submodule foreach git checkout master;
 			 cd $ROOT_PATH/web;
 			 yarn;'
+
+ # Create symlink to use "pc" command (admin rights may be needed)
+ elif [[ "$CMD" == "symlink" ]]; then
+   RUN='cd /usr/local/bin && ln -sf '"$(pwd)"'/$COMMAND_NAME $COMMAND_NAME && chmod +x $COMMAND_NAME && chmod +x '"$(pwd)"'/$COMMAND_NAME'
 
 # =============================================
 # Administration commands
