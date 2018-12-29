@@ -22,10 +22,8 @@ services:
         target: /opt/services/flaskapp/src/ftp_mirrors
         read_only: true
     environment:
-      - BUZZSUMO_API_KEY=$BUZZSUMO_API_KEY
       - ENV=${ENV:-development}
       - POSTGRES_URL=postgresql://geovote_user:geovote_password@postgres/geovote
-      - SCREEN_SHOT_MACHINE_KEY=$SCREEN_SHOT_MACHINE_KEY
     networks:
       - db_nw
       - web_nw
