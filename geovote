@@ -119,6 +119,10 @@ elif [[ "$CMD" == "clean-all-database" ]]; then
 elif [[ "$CMD" == "clean-all-storage" ]]; then
 	RUN='rm -rf $ROOT_PATH/flask/static/object_store_data;'
 
+# Build the static web and copy in the flask repo
+elif [[ "$CMD" == "build-frontend" ]]; then
+    RUN='cd $ROOT_PATH/web && yarn build;'
+
 # Force docker-compose to build the docker images
 elif [[ "$CMD" == "rebuild-backend" ]]; then
   RUN='docker-compose build --no-cache;'

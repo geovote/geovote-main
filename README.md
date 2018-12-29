@@ -18,3 +18,16 @@ Then for everybody:
 ```bash
   ./geovote install
 ```
+
+Build your static web:
+
+
+```bash
+  ./geovote build-frontend
+```
+
+Star your backend:
+
+```bash
+  ./geovote start-backend
+```
