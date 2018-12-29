@@ -1,0 +1,6 @@
+[submodule "web"]
+	path = web
+	url = git@github.com:geovote/geovote-web.git
+[submodule "flask"]
+	path = flask
+	url = git@github.com:geovote/geovote-flask.git
