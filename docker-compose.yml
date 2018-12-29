@@ -1,0 +1,56 @@
+version: '3.2'
+
+services:
+  postgres:
+    image: postgres:10.1
+    volumes:
+      - "./flask/postgres_data:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=geovote
+      - POSTGRES_PASSWORD=geovote_password
+      - POSTGRES_USER=geovote_user
+    networks:
+      - db_nw
+    command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
+
+  flask:
+    build: dockerfiles/flask
+    volumes:
+      - ./flask:/opt/services/flaskapp/src
+      - type: bind
+        source: ./flask/ftp_mirrors
+        target: /opt/services/flaskapp/src/ftp_mirrors
+        read_only: true
+    environment:
+      - BUZZSUMO_API_KEY=$BUZZSUMO_API_KEY
+      - ENV=${ENV:-development}
+      - POSTGRES_URL=postgresql://geovote_user:geovote_password@postgres/geovote
+      - SCREEN_SHOT_MACHINE_KEY=$SCREEN_SHOT_MACHINE_KEY
+    networks:
+      - db_nw
+      - web_nw
+    depends_on:
+      - postgres
+
+  nginx:
+    build: dockerfiles/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./dockerfiles/nginx/conf.d:/etc/nginx/conf.d
+      - ./certs:/etc/letsencrypt
+      - ./certs-data:/data/letsencrypt
+    networks:
+      - web_nw
+    depends_on:
+      - flask
+
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
+
+volumes:
+  postgres_data:
