@@ -121,7 +121,7 @@ elif [[ "$CMD" == "clean-all-storage" ]]; then
 
 # Build the static web and copy in the flask repo
 elif [[ "$CMD" == "build-frontend" ]]; then
-    RUN='cd $ROOT_PATH/web && yarn build;'
+    RUN='cd $ROOT_PATH/web && sh scripts/build_and_copy_build_to_flask.sh -p $ROOT_PATH/flask;'
 
 # Force docker-compose to build the docker images
 elif [[ "$CMD" == "rebuild-backend" ]]; then
