@@ -6,9 +6,9 @@ services:
     volumes:
       - "./flask/postgres_data:/var/lib/postgresql/data"
     environment:
-      - POSTGRES_DB=geovote
-      - POSTGRES_PASSWORD=geovote_password
-      - POSTGRES_USER=geovote_user
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_NAME}_password
+      - POSTGRES_USER=${DB_NAME}_user
     networks:
       - db_nw
     command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
@@ -22,8 +22,12 @@ services:
         target: /opt/services/flaskapp/src/ftp_mirrors
         read_only: true
     environment:
+      - APP_NAME=${APP_NAME}
+      - COMMAND_NAME=${COMMAND_NAME}
       - ENV=${ENV:-development}
-      - POSTGRES_URL=postgresql://geovote_user:geovote_password@postgres/geovote
+      - GIT_TAG=${GIT_TAG}
+      - POSTGRES_URL=postgresql://${DB_NAME}_user:${DB_NAME}_password@postgres/${DB_NAME}
+      - TLD=${TLD}
     networks:
       - db_nw
       - web_nw
