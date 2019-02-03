@@ -28,7 +28,7 @@ Build your static web:
   ./geovote build-frontend
 ```
 
-Star your backend:
+Start your backend:
 
 ```bash
   ./geovote start-backend
