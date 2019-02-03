@@ -1,0 +1,35 @@
+{
+  "name": "geovote",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "bulma": "^0.7.2",
+    "pass-culture-shared": "0.0.87-alpha"
+  },
+  "devDependencies": {
+    "node-sass": "^4.9.4",
+    "prettier-eslint": "^8.8.2",
+    "react-app-rewire-hot-loader": "^1.0.3",
+    "react-app-rewired": "^1.6.2",
+    "react-scripts": "2.0.5",
+    "stylelint": "^9.4.0",
+    "stylelint-config-standard": "^18.2.0",
+    "stylelint-order": "^0.8.1",
+    "stylelint-scss": "^3.2.0"
+  },
+  "scripts": {
+    "eject": "react-app-rewired eject",
+    "build": "react-app-rewired build",
+    "precommit": "./scripts/precommit.sh",
+    "testcafe": "testcafe 'chrome:headless' testcafe"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

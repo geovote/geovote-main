@@ -1,0 +1,7 @@
+.box {
+  @extend .p12;
+
+  background-color: $white;
+  border: 2px solid $grey-light;
+  border-radius: 6px;
+}

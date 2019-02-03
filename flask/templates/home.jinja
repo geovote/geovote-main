@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  {% include 'head.jinja' %}
+  <body>
+    {% include 'header.jinja' %}
+    <main class="main home-main">
+      <section
+        class="section flex-center items-center is-index-middle">
+        <div class="text-center">
+
+          <a class="button is-primary mb36" href="/creation">
+            Créer un nouveau vote
+          </a>
+
+          <br/>
+
+          <div class="title">
+            OU
+          </div>
+
+          <div>
+            <form action="/" method="post" name="vote">
+              <div class="field text-field label-aligned-with-control full">
+                <label htmlFor="text" class="field-label label-aligned-with-control">
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text text-center mx8 fs22 py10"
+                        name="questionId"
+                        placeholder="Code d'un vote existant"
+                        type="text"
+                        autocomplete="off"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+  </body>
+</html>

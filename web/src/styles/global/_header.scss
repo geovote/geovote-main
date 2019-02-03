@@ -1,0 +1,21 @@
+.header {
+  background-color: $primary;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 1000;
+
+  * {
+    pointer-events: auto;
+  }
+
+  .logo {
+    text-decoration: none;
+
+    div {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}

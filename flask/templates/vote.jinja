@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+  {% include 'head.jinja' %}
+  {% include 'geolocation.jinja' %}
+
+  <script>
+    // https://stackoverflow.com/questions/20618355/the-simplest-possible-javascript-countdown-timer
+    function startTimer(duration, display) {
+      var seconds;
+      var minutes;
+      var timer = duration;
+      setInterval(function () {
+
+        --timer
+
+        if (timer <= 0) {
+          display.textContent = "00:00"
+
+          if (timer < -3) {
+            window.location.reload()
+          }
+
+          return
+        }
+
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+      }, 1000);
+    }
+
+    function startVoteTimer () {
+      voteTimerElement = document.querySelector('#vote-timer');
+      if (voteTimerElement) {
+        var startTimeout = {{question.secondsLeftBeforePublish()}}
+        startTimer(startTimeout, voteTimerElement);
+        return true
+      }
+      return false
+    }
+
+    function startPublishTimer () {
+      publishTimerElement = document.querySelector('#publish-timer');
+      console.log('startTimeout')
+      if (publishTimerElement) {
+        var startTimeout = {{question.secondsLeftAfterPublish()}}
+        console.log('startTimeout', startTimeout)
+        startTimer(startTimeout, publishTimerElement);
+      }
+    }
+
+
+  </script>
+
+  <script>
+    function checkFootprint () {
+
+      if (typeof localStorage === 'undefined') {
+        console.log('No local storage here')
+        return
+      }
+
+      var geovotelocalKey = '{{LOCAL_STORAGE_KEY}}-{{question.id}}'
+      var localFootprint = localStorage.getItem(geovotelocalKey)
+
+      var localFootprintQuery = 'footprint=' + localFootprint
+      var isPageWithLocalFootprintQuery = window.location.search.includes(localFootprintQuery)
+      if (localFootprint && !isPageWithLocalFootprintQuery) {
+        window.location.href = window.location.pathname + '?' + localFootprintQuery
+        return
+      }
+
+      var serverFootprint = "{{footprint}}"
+      var serverFootprintQuery= 'footprint=' + serverFootprint
+      var isPageWithServerFootprintQuery = window.location.search.includes(serverFootprintQuery)
+
+      if (!localFootprint) {
+        if (serverFootprint !== "NEW") {
+          localStorage.setItem(geovotelocalKey, serverFootprint)
+        }
+        if (!isPageWithServerFootprintQuery) {
+          window.location.href = window.location.pathname + '?' + serverFootprintQuery
+          return
+        }
+      }
+
+      var voteBoardElement = document.querySelector('#vote-board')
+      if (localFootprint || serverFootprint) {
+        voteBoardElement.style.display = null
+      }
+
+
+    }
+  </script>
+
+  <script>
+    window.onload = function () {
+      console.log('{{question.isPublished}} {{question.isPublic}}')
+      {% if not question.isPublished %}
+        console.log('qdsqd')
+        startVoteTimer()
+        checkFootprint()
+      {% elif question.isPublic %}
+        console.log('dPI')
+        startPublishTimer()
+      {% endif %}
+    }
+  </script>
+
+  <script>
+    function checkAtLeastOneCheck () {
+      var checkboxInputElements = document.querySelectorAll(
+        'input[name^="answer-"]'
+      )
+
+      var isAtLeastOneCheck = Array.from(checkboxInputElements).find(
+        function(checkboxInputElement) {
+          return checkboxInputElement.checked
+        })
+
+      if (!isAtLeastOneCheck) {
+        alert("Vous devez choisir au moins une réponse")
+        return false
+      }
+
+      return true
+    }
+
+
+    function validateForm(form) {
+
+      if (!checkAtLeastOneCheck()) {
+        return false
+      }
+
+      var submitButtonElement = document.querySelector('button[type="submit"]');
+      submitButtonElement.className += " is-loading";
+      var hasConfirmed = confirm('Approuvé ?');
+      if (!hasConfirmed) {
+        submitButtonElement.className = submitButtonElement
+                                          .className
+                                          .replace(" is-loading", "")
+      }
+
+      {% if question.radius %}
+        if (!hasFoundGeolocation) {
+
+          disableFormWhenGeolocationNeeded()
+
+          setTimeout(
+            function () {
+              initGeolocation(
+                function () {
+                  reenableFormWhenGeolocationOkOrNoMoreNeeded()
+                  form.submit()
+                }
+              )
+            }, 3000)
+
+          return false
+        }
+      {% endif %}
+
+      return hasConfirmed
+    }
+  </script>
+
+  <body>
+
+    {% include 'header.jinja' %}
+
+    <main class="main vote-main">
+      <section class="section flex-center items-center is-index-middle">
+
+        <div class="text-center">
+
+          <br/>
+          <br/>
+
+          <div class="title">
+            Question {{question.humanizedId}}
+          </div>
+          <div class="box subtitle mb12">
+            {{question.text}}
+          </div>
+
+          {% if question.radius %}
+            <div class="fs12">
+              C'est un vote géolocalisé.
+
+              {% if is_too_far %}
+                <br />
+                <br />
+                <div class="fs22" style="color:red;">
+                  Vous êtes trop loin du point de vote.
+                </div>
+              {% endif %}
+
+            </div>
+          {% endif %}
+
+        </div>
+      </section>
+
+      <section
+        class="section flex-center items-center is-index-middle"
+        id="vote-board"
+        style="display:none;"
+      >
+        {% if not question.isPublished and not has_voted %}
+          <div class="text-center">
+            <form
+              action="/vote/{{question.humanizedId}}/form"
+              class="text-center"
+              method="post"
+              onsubmit="return validateForm(this);"
+            >
+
+              <input name="latitude" type="hidden" />
+              <input name="longitude" type="hidden" />
+
+              <div class="title">
+                Réponses possibles
+              </div>
+              <div class="box field-group">
+                {% for answer in question.answers %}
+                  <div class="field checkbox-field label-aligned-with-control">
+                    <label htmlFor="isPublic" class="field-label">
+                      <span class="subtitle">
+                        <span>{{answer.text}}</span>
+                      </span>
+                    </label>
+                    <div class="field-control">
+                      <div class="field-value flex-columns items-center">
+                        <input
+                          class="field-input field-checkbox"
+                          name=answer-{{answer.humanizedId}}
+                          type="checkbox"
+                          value={{answer.humanizedId}}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              <br/>
+
+              <div class="flex-columns items-center flex-center">
+                <div class="mx12">
+                  <div class="box">
+                    <div>
+                      termine dans
+                    </div>
+                    <span class="title" id="vote-timer">
+                      {{question.timeLeftBeforePublish()}}
+                    </span>
+                  </div>
+                </div>
+                <button class="button is-primary mb8" type="submit" style="font-size:25px;">
+                  Voter
+                </button>
+              </div>
+
+              <br />
+              <div class="fs12" id="geolocation-message" style="display:none;">
+                recherche de la géolocalisation...
+              </div>
+            </form>
+          </div>
+        {% elif not question.isPublished and has_voted %}
+          <div class="text-center">
+            <h1 class="subtitle">
+              Vous avez répondu à ce vote.
+            </h1>
+            <br />
+            <br />
+            <div class="flex-columns items-center flex-center">
+              <div class="mx12">
+                <div class="box">
+                  <div>
+                    termine dans
+                  </div>
+                  <span class="title" id="vote-timer">
+                    {{question.timeLeftBeforePublish()}}
+                  </span>
+                </div>
+              </div>
+              <a class="button is-primary" href='/'>
+                Accueil
+              </a>
+            </div>
+          <div>
+        {% endif %}
+      </section>
+
+      {% if question.isPublished %}
+        <section class="section flex-center items-center is-index-middle">
+          <div class="text-center">
+            <h1 class="title">
+              Résultats
+            </h1>
+
+            <div class="box mb8">
+              {% for answer in question.answers %}
+                <div class="field checkbox-field label-aligned-with-control">
+                  <label htmlFor="isPublic" class="field-label">
+                    <span class="subtitle">
+                      <span>{{answer.text}}</span>
+                    </span>
+                  </label>
+                  <div class="field-control">
+                    <div class="field-value flex-columns items-center">
+                      {{answer.finalCount}}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if question.isPublished %}
+        <section class="section flex-center items-center is-index-middle">
+          <div class="flex-columns items-center flex-center">
+            {% if question.isPublic %}
+              <div class="mx12">
+                <div class="box">
+                  <div>
+                    effacé dans
+                  </div>
+                  <span class="title" id="vote-timer">
+                    {{question.timeLeftBeforePublish()}}
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+            <a class="button is-primary" href='/'>
+              Accueil
+            </a>
+          </div>
+          <div class="text-center">
+            <div class="mb12" style="display:none;">
+              votre empreinte: {{footprint}}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+    </main>
+  </body>
+</html>

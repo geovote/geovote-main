@@ -1,0 +1,172 @@
+.form {
+  @extend .box;
+  @extend .p36;
+  @extend .is-relative;
+}
+
+.field-sep {
+  @extend .is-absolute;
+
+  border-top: 1px solid $grey-light;
+  height: 16px;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+
+.field-group {
+  display: table;
+  width: 100%;
+  margin-bottom: 1rem;
+
+  &.border-top {
+    border-top: 1px solid $grey;
+  }
+
+  .field-group-title {
+    @extend .fs16;
+    @extend .mb16;
+
+    color: $blue-light;
+    font-weight: 400;
+  }
+}
+
+.form-footer {
+  height: $footer-height;
+  min-height: $footer-height;
+  max-height: $footer-height;
+
+  button {
+    @extend .no-border;
+    @extend .no-outline;
+    @extend .no-background;
+  }
+}
+
+.field-label {
+  @extend .mb12;
+  @extend .pb6;
+  @extend .pr12;
+  @extend .fs14;
+
+  .field-asterisk {
+    @extend .ml2;
+
+    color: $primary;
+  }
+
+  &.empty {
+    padding: 0;
+  }
+}
+
+.field-inner {
+  background-color: $white;
+  border-radius: rem(10px);
+  border: 2px solid $grey-light;
+  overflow: hidden;
+}
+
+.checkbox-field {
+  .field-label {
+    text-align: left;
+  }
+}
+
+.field-select {
+  @extend .no-outline;
+  @extend .no-background;
+  @extend .pl24;
+  @extend .fs16;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-repeat: no-repeat;
+  background-position: 97.5% 50%;
+  background-image: url('/static/icons/dropdown-disclosure-down.svg');
+  border-radius: rem(16px);
+  border: none;
+  font-weight: 500;
+  height: 36px;
+  min-width: 250px;
+  min-height: 36px;
+}
+
+.field-input,
+.field-textarea {
+  @extend .flex-1;
+  @extend .fs20;
+  @extend .is-medium;
+  @extend .no-border;
+  @extend .no-outline;
+  @extend .px14;
+  @extend .py6;
+}
+
+.field-input,
+.field-select {
+  color: $text;
+  max-width: 250px;
+
+  @media (min-width: $tablet) {
+    max-width: 100%;
+  }
+}
+
+.field-textarea {
+  @extend .text-center;
+
+  max-width: inherit;
+  min-height: 50px;
+  resize: none;
+
+  @media (min-width: $tablet) {
+    max-width: 100%;
+  }
+}
+
+.textarea-field {
+  .field-inner {
+    width: 100%;
+  }
+}
+
+.field-control {
+  @extend .pt16;
+}
+
+.label-aligned-with-control {
+  display: table-row;
+
+  .field-label,
+  .field-value {
+    display: table-cell;
+  }
+}
+
+.full {
+  .field-value {
+    width: 50%;
+  }
+}
+
+.form .label-aligned-with-control {
+  .field {
+    @extend .label-aligned-with-control;
+  }
+}
+
+.field .label-aligned-with-control {
+  @extend .label-aligned-with-control;
+}
+
+.field-errors {
+  color: $red;
+  min-height: 24px;
+
+  &.field-error-message + .field-error-message {
+    // si on a plusieurs erreurs pour un seul champ
+    @extend .pl12;
+  }
+}

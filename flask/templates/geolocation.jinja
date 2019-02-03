@@ -1,0 +1,54 @@
+<script>
+  var needsGeolocation = false
+  var hasFoundGeolocation = false
+
+  function reenableFormWhenGeolocationOkOrNoMoreNeeded () {
+    var geolocalisationMessageElement = document.querySelector('#geolocation-message')
+    var submitButtonElement = document.querySelector('button[type="submit"]')
+    submitButtonElement.disabled = false
+    submitButtonElement.className = submitButtonElement.className.replace(' is-loading', '')
+    geolocalisationMessageElement.style.display = "none"
+  }
+
+  function disableFormWhenGeolocationNeeded () {
+    var geolocalisationMessageElement = document.querySelector('#geolocation-message')
+    var submitButtonElement = document.querySelector('button[type="submit"]')
+    submitButtonElement.disabled = true
+    submitButtonElement.className += " is-loading"
+    geolocalisationMessageElement.style.display = "initial"
+  }
+
+  function initGeolocation (callback) {
+    needsGeolocation = true
+
+    var latitudeInputElement = document.querySelector('input[name="latitude"]')
+    var longitudeInputElement = document.querySelector('input[name="longitude"]')
+
+    latitudeInputElement.required = true
+    longitudeInputElement.required = true
+
+    if (!navigator.geolocation || !navigator.geolocation.watchPosition) {
+      console.log('No geolocation here')
+      return
+    }
+
+    navigator.geolocation.watchPosition(
+      position => {
+        console.log('Geolocation received', position)
+
+        hasFoundGeolocation = true
+
+        latitudeInputElement.value = position.coords.latitude
+        longitudeInputElement.value = position.coords.longitude
+
+        callback(position)
+      },
+      error => console.warn('Could not get geolocation', error),
+      {
+        enableHighAccuracy: false,
+        maximumAge: 10 * 60 * 1000, // 10 minutes
+        timeout: 5 * 1000, // 5 seconds
+      }
+    )
+  }
+</script>

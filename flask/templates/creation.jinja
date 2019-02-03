@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+  {% include 'head.jinja' %}
+  {% include 'geolocation.jinja' %}
+
+  <script>
+    function createHtmlFragment(htmlStr) {
+      var frag = document.createDocumentFragment(),
+          temp = document.createElement('div');
+      temp.innerHTML = htmlStr;
+      while (temp.firstChild) {
+        frag.appendChild(temp.firstChild);
+      }
+      return frag;
+    }
+
+    function addAnswer() {
+      var answersGroupElement = document.getElementById('answers-group')
+      var answerIndex = answersGroupElement.children.length + 1
+      var fragment = createHtmlFragment(
+        [
+          '<div class="text-field label-aligned-with-control">',
+            '<label htmlFor="text" class="field-label label-aligned-with-control">',
+              '<span>',
+                '<span class="mr12">' + answerIndex + '</span>',
+              '</span>',
+            '</label>',
+            '<div class="field-control">',
+              '<div class="field-value flex-columns items-center">',
+                '<div class="field-inner flex-columns items-center">',
+                  '<input ',
+                    'class="field-input field-text" ',
+                    'name="answerText' + answerIndex + '" ',
+                    'type="text" ',
+                  '/>',
+                '</div>',
+              '</div>',
+            '</div>',
+          '</div>'
+        ].join('')
+      );
+      answersGroupElement.appendChild(fragment)
+    }
+  </script>
+
+  <script>
+    function handleGeolocation (event) {
+
+      if (!hasFoundGeolocation) {
+
+        if (event.target.value === '') {
+          needsGeolocation = false
+          reenableFormWhenGeolocationOkOrNoMoreNeeded()
+          return
+        }
+
+        disableFormWhenGeolocationNeeded()
+
+        setTimeout(
+          function () {
+            initGeolocation(
+              reenableFormWhenGeolocationOkOrNoMoreNeeded
+            )
+          }, 3000)
+      }
+    }
+  </script>
+
+  <script>
+    function displayPublishDuration (event) {
+      var publishDurationFieldElement = document.querySelector('#publish-duration')
+      if (event.target.checked) {
+        publishDurationFieldElement.style.display = "none"
+        return
+      }
+      publishDurationFieldElement.style.display = "table-row"
+    }
+  </script>
+
+  <script>
+    function validateForm(form) {
+
+      if (needsGeolocation && !hasFoundGeolocation) {
+        alert("Le vote n'est pas soumettable tant que la géolocalisation n'a pas été déterminée.")
+        return false
+      }
+
+      var submitButtonElement = document.querySelector('button[type="submit"]')
+      submitButtonElement.className += " is-loading"
+      var hasConfirmed = confirm('Prêt pour soumettre le vote ?');
+      if (!hasConfirmed) {
+        submitButtonElement.className = submitButtonElement
+                                          .className
+                                          .replace(" is-loading", "")
+      }
+
+      return hasConfirmed
+    }
+  </script>
+
+  <body>
+    {% include 'header.jinja' %}
+    <main class="main creation-main">
+      <section class="section flex-center items-center is-index-middle mt24">
+        <div class="text-center col-100">
+          <form
+            action="/creation/form"
+            method="post"
+            name="question"
+            onsubmit="return validateForm(this);"
+          >
+
+            <div class="field-group">
+              <div class="field textarea-field">
+                <label htmlFor="text" class="field-label">
+                  <span>
+                    <span class="title"> Question </span>
+                    <span class="field-asterisk">*</span>
+                  </span>
+                </label>
+                <br/>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <textarea
+                        class="field-input field-textarea"
+                        name="text"
+                        placeholder="Ecrire votre question ici"
+                        required
+                        rows="2"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <br/>
+
+            <div class="title">
+              Réponses possibles
+            </div>
+            <div class="field-group" id="answers-group">
+              <div class="field text-field label-aligned-with-control">
+                <label htmlFor="text" class="field-label label-aligned-with-control">
+                  <span>
+                    <span>1</span>
+                    <span class="field-asterisk">*</span>
+                  </span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="answerText1"
+                        type="text"
+                        required
+                        value="Oui"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field text-field label-aligned-with-control">
+                <label htmlFor="text" class="field-label label-aligned-with-control">
+                  <span>
+                    <span>2</span>
+                    <span class="field-asterisk">*</span>
+                  </span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="answerText2"
+                        type="text"
+                        required
+                        value="Non"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field text-field label-aligned-with-control">
+                <label htmlFor="text" class="field-label label-aligned-with-control">
+                  <span>
+                    <span class="mr12">3</span>
+                  </span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="answerText3"
+                        type="text"
+                        placeholder="Ecrire une autre réponse"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-left ml60">
+            <button
+              class="button is-secondary"
+              onclick="addAnswer()"
+              type="button"
+            >
+              + Ajouter une réponse
+            </button>
+            </div>
+            <br/>
+            <br/>
+
+            <div class="field-group border-top" style="display:none;">
+
+              <div class="field text-field label-aligned-with-control"style="display:none;">
+                <label htmlFor="voteDuration" class="field-label text-left label-aligned-with-control" style="display:none;">
+                  <span>Durée du vote</span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="voteDuration"
+                        placeholder="durée en secondes"
+                        type="number"
+                        value=120
+                        style="display:none;"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field text-field label-aligned-with-control" style="display:none;">
+                <label htmlFor="radius" class="field-label text-left label-aligned-with-control" style="display:none;">
+                  <span>Périmètre</span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="radius"
+                        onchange="handleGeolocation(event);"
+                        placeholder="Distance en mètres"
+                        type="number"
+                        style="display:none;"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <span class="fs12" id="geolocation-message" style="display:none;">
+                  Recherche de la géolocalisation...
+                </span>
+              </div>
+
+              <div class="field checkbox-field label-aligned-with-control">
+                <label htmlFor="isPublic" class="field-label" style="display:none;">
+                  <span>
+                    <span>Publique</span>
+                  </span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <input
+                      class="field-input field-checkbox"
+                      name="isPublic"
+                      onchange="displayPublishDuration(event)"
+                      type="checkbox"
+                      value="True"
+                      style="display:none;"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="field text-field label-aligned-with-control" id="publish-duration">
+                <label htmlFor="publishDuration" class="field-label text-left label-aligned-with-control" style="display:none;">
+                  <span>Durée des résultats</span>
+                </label>
+                <div class="field-control">
+                  <div class="field-value flex-columns items-center">
+                    <div class="field-inner flex-columns items-center">
+                      <input
+                        class="field-input field-text"
+                        name="publishDuration"
+                        placeholder="durée en secondes"
+                        type="number"
+                        value=180
+                        style="display:none;"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="button is-primary" type="submit">
+              Créer le vote
+            </button>
+
+          </form>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

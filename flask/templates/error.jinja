@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  {% include 'head.jinja' %}
+  <meta http-equiv="refresh" content="3;url=/" />
+
+  <body>
+    {% include 'header.jinja' %}
+    <main class="main error-main">
+      <section class="section flex-center items-center is-index-middle">
+        <div>
+          <h1 class="title text-center">
+            Ooops.
+          </h1>
+          <h2 class="subtitle text-center">
+            {{ message or "Vous cherchez une page qui n'existe pas (ou plus).<br/> Vous allez être redirigé dans 3 secondes."}}
+          </h2>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

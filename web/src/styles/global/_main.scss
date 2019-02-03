@@ -1,0 +1,40 @@
+.main {
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 24px;
+  padding-top: $header-height;
+  width: 90%;
+
+  @media (min-width: $tablet) {
+    width: 75%;
+  }
+
+  .section {
+    &:not(:last-child) {
+      @extend .mb32;
+    }
+
+    .title {
+      @extend .fs30;
+
+      color: $grey-darker;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      @extend .fs22;
+
+      color: $grey-dark;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .info {
+      @extend .fs12;
+
+      color: $grey;
+      font-weight: 500;
+    }
+  }
+}
