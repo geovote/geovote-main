@@ -8,8 +8,10 @@ For the frontend development:
   - yarn (https://yarnpkg.com/en/docs/install)
 
 Specially for macosx users:
-  - brew install coreutils
-
+  ```bash
+    brew install coreutils
+  ```
+  
 You need a version of Node:
   - 8.11.1 or 10.13.0
 
@@ -26,7 +28,7 @@ Build your static web:
   ./geovote build-frontend
 ```
 
-Star your backend:
+Start your backend:
 
 ```bash
   ./geovote start-backend
