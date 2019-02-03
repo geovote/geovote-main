@@ -7,7 +7,7 @@ set -o nounset
 # =============================================
 
 export APP_NAME="geovote"
-export COMMAND_NAME=$APP_NAME
+export COMMAND_NAME="gv"
 export DB_NAME=$APP_NAME
 export TLD="fr"
 
@@ -187,6 +187,9 @@ elif [[ "$CMD" == "deploy-backend" ]]; then
     git checkout "$current_branch"
     exit
     }
+
+  scalingo -a $SCALINGO_APP env-set GIT_TAG=$GIT_TAG
+
   git fetch
   git checkout master
   git pull || exit_restoring_branch
@@ -234,18 +237,12 @@ elif [[ "$CMD" == "install" ]]; then
 # Connect to Postgresql database in command line
 elif [[ "$CMD" == "psql" ]]; then
 	COLUMNS=${COLUMNS:-''};
-	if [[ "$ENV" == "production" ]]; then
-		scalingo -a $APP_NAME-backend pgsql-console
-		exit
-	elif [[ "$ENV" == "staging" ]]; then
-		scalingo -a $APP_NAME-backend-staging pgsql-console
-		exit
-	elif [[ "$ENV" == "testing" ]]; then
-		scalingo -a $APP_NAME-backend-testing pgsql-console
-		exit
+	if [[ "$ENV" == "development" ]]; then
+    RUN='docker exec -it `docker ps | grep postgres | cut -d" " -f 1` bash -c "COLUMNS=\"'$COLUMNS'\" psql -U '$DB_NAME'_user '$DB_NAME' $*"'
 	else
-		RUN='docker exec -it `docker ps | grep postgres | cut -d" " -f 1` bash -c "COLUMNS=\"'$COLUMNS'\" psql -U '$DB_NAME'_user '$DB_NAME' $*"'
-	fi
+		scalingo -a $SCALINGO_APP pgsql-console
+		exit
+  fi
 
 # Open a python prompt in the specified environment
 elif [[ "$CMD" == "python" ]]; then
