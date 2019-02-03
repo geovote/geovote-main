@@ -219,11 +219,7 @@ elif [[ "$CMD" == "deploy-backend" ]]; then
 
 # Install new local environment
 elif [[ "$CMD" == "install" ]]; then
-  RUN='cd $ROOT_PATH;
-       git submodule init;
-       git submodule update;
-       git submodule foreach git checkout master;
-			 cd $ROOT_PATH/web;
+  RUN='cd $ROOT_PATH/web;
 			 yarn;'
 
  # Create symlink to use "pc" command (admin rights may be needed)
