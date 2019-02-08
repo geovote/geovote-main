@@ -210,16 +210,14 @@
       <section
         class="section flex-center items-center is-index-middle"
         id="vote-board"
-        style="display:none;"
-      >
+        style="display:none;">
         {% if not question.isPublished and not has_voted %}
           <div class="text-center">
             <form
               action="/vote/{{question.humanizedId}}/form"
               class="text-center"
               method="post"
-              onsubmit="return validateForm(this);"
-            >
+              onsubmit="return validateForm(this);">
 
               <input name="latitude" type="hidden" />
               <input name="longitude" type="hidden" />
@@ -275,23 +273,15 @@
         {% elif not question.isPublished and has_voted %}
           <div class="text-center">
             <h1 class="subtitle">
-              Vous avez répondu à ce vote.
+              Merci d'avoir voté. Attendez  <span class="title" id="vote-timer">
+                    {{question.timeLeftBeforePublish()}}
+                  </span> minutes pour voir le résultat.
             </h1>
             <br />
             <br />
             <div class="flex-columns items-center flex-center">
-              <div class="mx12">
-                <div class="box">
-                  <div>
-                    termine dans
-                  </div>
-                  <span class="title" id="vote-timer">
-                    {{question.timeLeftBeforePublish()}}
-                  </span>
-                </div>
-              </div>
-              <a class="button is-primary" href='/'>
-                Accueil
+              <a class="button is-primary" onclick=" window.open('/','_blank')">
+                Autre vote
               </a>
             </div>
           <div>
