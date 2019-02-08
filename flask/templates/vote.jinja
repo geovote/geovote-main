@@ -183,7 +183,7 @@
           <br/>
 
           <div class="title">
-            Question {{question.humanizedId}}
+            Référence du vote :  {{question.humanizedId}}
           </div>
           <div class="box subtitle mb12">
             {{question.text}}
@@ -225,7 +225,7 @@
               <input name="longitude" type="hidden" />
 
               <div class="title">
-                Réponses possibles
+                Choisir une ou des réponses :
               </div>
               <div class="box field-group">
                 {% for answer in question.answers %}
@@ -254,7 +254,7 @@
                 <div class="mx12">
                   <div class="box">
                     <div>
-                      termine dans
+                      Le vote se termine dans
                     </div>
                     <span class="title" id="vote-timer">
                       {{question.timeLeftBeforePublish()}}
